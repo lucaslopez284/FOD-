@@ -97,41 +97,42 @@ type
         seek(arc,posAct - 1); // vuelvo una atras para no perder info
       end;
       leer(arc,e);
-    end; 
+    end;  
     close(arc); 
   end; 
   
   procedure borradoFisicoB (var arc: archivo); // CONSULTAR
   var e,ult: especie; posAct,posFin, invalidos: integer;
   begin
-    assign (arc,'especies.dat');
-    reset(arc);
-    posFin:= filesize(arc) -1;
+    assign (arc,'especies.dat'); // asigno el archivo
+    reset(arc); // arranco desde el principio
+    posFin:= filesize(arc) -1; // pos del registro final
     posAct:= 0;
-    invalidos:= 0;
+    invalidos:= 0; // total a eliminar
     leer(arc,e);
-    while (e.cod <> alto) do begin
+    while (posAct <= posFin) do begin // proceso hasta que posAct supere a posFin (donde arrancan los invalidos)
       if (e.cod < 0) then begin
         seek(arc,posFin);
         leer(arc,ult);
         posAct:= filepos(arc) - 1;
-        while (ult.cod < 0) and (posAct < posFin) do begin
-          invalidos := invalidos + 1;
+        while (ult.cod < 0) and (posAct < posFin) do begin // busco y sumo hasta encontrar un ult valido
+          invalidos := invalidos + 1; // cada vez que encuentro un reg a borrar, incremento la variable que acumula
           posFin:= posFin - 1;
           seek(arc,posFin);
           leer(arc,ult);
         end;
         if (posAct< posFin) then begin
           seek(arc,posFin);
-          write(arc,e);
+          write(arc,e); // paso 1 intercambio
           seek(arc,posAct);
-          write(arc,ult);
+          write(arc,ult); // paso 2 intercambio
           posFin:= posFin - 1;
          end;
       end;
-      leer(arc,e);
+      posAct:= posAct + 1; // actualizo posAct para la condicion de while
+      leer(arc,e); // leo otro reg
     end;
-    seek(arc, filesize(arc) - invalidos);
+    seek(arc, filesize(arc) - 1 - invalidos); // pos del ult registro - cant a borrar
     truncate(arc);
     close(arc);
   end; 
@@ -143,6 +144,6 @@ begin
   crearArchivo(arc);
   imprimirArchivo(arc);
   borradoLogico(arc);
-  borradoFisicoA(arc);
+  borradoFisicoB(arc);
   imprimirArchivo(arc);
 end.
