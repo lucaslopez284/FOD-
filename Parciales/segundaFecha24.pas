@@ -52,18 +52,7 @@ type
  begin
    writeln('Lista de municipios con mas de 15 positivos');
    reset (arc);
-   
-   // resetear detalles(reg,det);
-   procedure actualizarMaestroEInformo( var arc: archivo; var reg: registros; var det: detalles);
- var
-   mae: infoMae;
-   det,min: infoDet;
-   nuevos:= 0;
-   codAct: integer;
- begin
-   writeln('Lista de municipios con mas de 15 positivos');
-   reset (arc);
-   
+    
    // resetear detalles(reg,det);
    
    minimo (min,reg,det);
@@ -91,29 +80,6 @@ type
  
  end;
  
-   while (not eof (arc)) do begin
-     read (arc, mae);
-     
-     nuevos:= 0;
-     while (min.cod <> alto) and(min.cod = mae.cod) do begin
-        nuevos:= nuevos + min.casos;
-        minimo(min,reg,det);
-     end;
-     if (nuevos > 0) then begin
-       mae.casos:= mae.casos + nuevos;
-       seek(arc, filepos(arc) - 1);
-       write (arc,mae);
-     end;
-     if (mae.casos > 15) then begin
-       writeln('Municipio: ' , mae.nombre, ' , casos: ', mae.casos);
-     end;
-   end;
-   
-   
-   close(arc);
-   cerrarDetalles(det);
- 
- end;
  
 
 var arc: archivo; reg: registros; det: detalles;
